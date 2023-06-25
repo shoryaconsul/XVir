@@ -1,7 +1,6 @@
 <<<<<<< HEAD
-# Deep Learning Training Scaffold
-
-This repository contains a starter app which can be used to speed-up your next machine learning/deep learning project.
+# XVir
+Transformer-based classifier for viral read identification in cancerous samples
 
 ## Requirements
 
@@ -33,6 +32,3 @@ Feel free to update your `environment.yml` file. I've provided one example file.
 
 `python main.py <args>`
 =======
-# XVir
-Transformer-based classifier for viral read identification in cancerous samples
->>>>>>> 5fb05cabca18981d88305ab1ae9edea28bc49733
