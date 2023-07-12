@@ -1,67 +1,55 @@
-'''
-Written by: Saksham Consul 04/28/2023
-Model for CNN + GRU + MLP + Softmax
-'''
+import numpy as np
 
 import torch.nn as nn
 import torch
-import pdb
+# import pdb
 
 
-class GRU_MLP_Softmax(nn.Module):
-    def __init__(self, input_dim, hidden_dim, num_layers, output_dim, dropout_prob=0):
-        super(GRU_MLP_Softmax, self).__init__()
-        # Defining the number of layers and the nodes in each layer
-        self.output_dim = output_dim
+def create_pos_embeddings(n_pos, dim, out):
+    pos_enc = np.array([[pos / np.power(10000, 2 * (j // 2) / dim)
+                    for j in range(dim)] for pos in range(n_pos)])
+    out[:, 0::2] = torch.FloatTensor(np.sin(pos_enc[:, 0::2]))
+    out[:, 1::2] = torch.FloatTensor(np.cos(pos_enc[:, 1::2]))
+    out.detach_()
+    # out.requires_grad = False
+
+class XVir(nn.Module):
+    def __init__(self, read_len, ngram, model_dim, num_layers, dropout_prob):
+        super(XVir, self).__init__()
+        self.n = ngram
+        self.input_dim = read_len - self.n + 1
+        self.model_dim = model_dim
         self.num_layers = num_layers
-        self.hidden_dim = hidden_dim
 
-        # CNN layer
-        self.cnn = nn.Conv2d(
-            in_channels=3, out_channels=1, kernel_size=(1, 1))
-        # GRU layers
-        self.gru = nn.GRU(
-            3*input_dim, hidden_dim, num_layers=num_layers, batch_first=True, dropout=dropout_prob
+        ff_dim = 4*model_dim
+        num_head = 4
+
+        self.ngram_embed = nn.Embedding(4**self.n, self.model_dim)
+        self.pos_embed = nn.Embedding(self.input_dim, self.model_dim)  # Configure position embeddings
+        self.pos_embed.weight.requires_grad = False
+        create_pos_embeddings(self.input_dim, self.model_dim, self.pos_embed.weight)
+        self.LayerNorm = nn.LayerNorm(self.model_dim)
+        self.dropout = nn.Dropout(dropout_prob)
+
+        xformLayer = nn.TransformerEncoderLayer(self.model_dim, num_head,
+                        ff_dim, batch_first=True, dropout=dropout_prob)
+        self.xformEncoder = nn.TransformerEncoder(xformLayer, self.num_layers)
+        self.prob = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(self.model_dim*self.input_dim, 1),
+            # nn.Sigmoid()
         )
-
-        # MLP layers
-        self.mlp = nn.Sequential(
-            nn.Linear(hidden_dim, 64),
-            nn.GELU(),
-            nn.Linear(64, 32),
-            nn.GELU(),
-            nn.Linear(32, 16),
-            nn.GELU(),
-            nn.Linear(16, output_dim),
-            nn.GELU()
-        )
-        self.batch_norm = nn.BatchNorm2d(10)
-        # self.softmax = nn.Softmax(dim=2) # CrossEntropyLoss incorporates this already
-
+    
     def forward(self, x):
-        """
-        Takes an input tensor x of shape (batch_size, sequence_length (n_words), n_channels, input_dim)
-        and passes it through the GRU layer to obtain a sequence of hidden states.
-        We then take the last hidden state and pass it through the MLP layer to obtain a higher-level
-        representation, and then pass that through the softmax layer to obtain the output probability vector.
-        """
-        batch_size, sequence_len, n_channel, input_dim = x.size()
-        # Add batch norm
-        x = self.batch_norm(x)
-        x_view = x.view(batch_size, sequence_len, n_channel * input_dim)
+        x_ngram = self.ngram_embed(x)
 
-        # (n_channel, batch_size*sequence_len, input_dim)
-        # x_channel = self.cnn(x_view.transpose(0, 1))
-        # x_channel = x_channel.view(batch_size, sequence_len, input_dim)
-        # Initializing hidden state for first input with zeros
-        h0 = torch.zeros(self.num_layers, batch_size,
-                         self.hidden_dim).to(x.device)
-        import pdb
-        pdb.set_trace()
-        # Forward propagation by passing in the input and hidden state into the model
-        # (batch_size, seq length, hidden_size)
-        out, _ = self.gru(x_view, h0)
-        # # Convert the final state to our desired output shape (batch_size, seq length, output_dim)
-        out = self.mlp(out)  # (batch_size, seq length, output_dim)
-        out = out.view(batch_size*sequence_len, self.output_dim)
-        return out
+        pos_ids = torch.arange(self.input_dim, dtype=torch.long,
+                            device=x.get_device())
+        pos_ids = pos_ids.unsqueeze(0).expand_as(x)  # (bs, max_seq_length)
+        x_pos = self.pos_embed(pos_ids)
+
+        x_embed = x_ngram + x_pos
+        x_model = self.dropout(self.LayerNorm(x_embed))
+        x_enc = self.xformEncoder(x_model)
+        x_prob = self.prob(x_enc)
+        return x_prob

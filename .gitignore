@@ -3,3 +3,8 @@ data/*.txt
 data/*.pkl
 data/*.fa
 data/human_genome
+data/read2numeric
+
+test.py
+logs
+ __pycache__

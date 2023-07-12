@@ -8,15 +8,24 @@ import os
 import time
 import numpy as np
 import torch
-from tensorboardX import SummaryWriter
-from utils.general_tools import get_args, backup_files
-from utils.plotting import simple_plot, plot_labels
-from utils.train_tools import get_train_valid_test_data
-from utils.dataset import sEMGDataset
+import logging
 
-from model import GRU_MLP_Softmax
+from utils.general_tools import get_args #, backup_files
+# from utils.plotting import simple_plot, plot_labels
+from utils.train_tools import get_train_valid_test_data
+from utils.dataset import kmerDataset
+
+from model import XVir
 from trainer import Trainer
 import pdb
+
+
+class MyFilter(object):
+    def __init__(self, level):
+        self.__level = level
+
+    def filter(self, logRecord):
+        return logRecord.levelno <= self.__level
 
 
 def main(args):
@@ -24,16 +33,8 @@ def main(args):
         time.strftime('%Y.%m.%d-%H-%M-%S', time.localtime(time.time()))
 
     # Load data
-    dataset = sEMGDataset(args)
-    train_dataset, valid_dataset, test_dataset, class_weights = get_train_valid_test_data(dataset,
-                                                                                          args)
-    # Plotting
-    if args.plot:
-        simple_plot(dataset.data, "60bpm", "Time", "Voltage",
-                    "data/plots/60bpm.png", args.sampling_rate)
-
-        plot_labels(dataset.labels, dataset.data, "60bpm", "Time", "Voltage",
-                    "data/plots/60bpm_labeled.png", args.sampling_rate)
+    dataset = kmerDataset(args)
+    train_dataset, valid_dataset, test_dataset, = get_train_valid_test_data(dataset, args)
 
     # Dataloader
     train_loader = torch.utils.data.DataLoader(
@@ -44,11 +45,9 @@ def main(args):
         test_dataset, batch_size=args.batch_size, shuffle=True)
 
     # Model
-    model = GRU_MLP_Softmax(input_dim=args.input_dim,
-                            hidden_dim=args.hidden_dim,
-                            num_layers=args.num_layers,
-                            output_dim=args.output_dim,
-                            dropout_prob=args.dropout)
+    model = XVir(
+        args.read_len, args.ngram, args.model_dim, args.num_layers, args.dropout
+    )
 
     # Load the trained model, if needed
     if args.load_model or args.eval_only:
@@ -60,24 +59,46 @@ def main(args):
             exit(1)
     # Create create tensorboard logs
     if args.eval_only:
-        log_writer_path = './logs/eval/'.format('IParm-' + time_string)
+        log_writer_path = './logs/eval'
     else:
-        log_writer_path = './logs/runs/{}'.format('IParm-' + time_string)
+        log_writer_path = './logs/runs'
     if not os.path.exists(log_writer_path):
         os.makedirs(log_writer_path)
-    writer = SummaryWriter(logdir=log_writer_path)
+
+    # Set up logger
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
+
+    # Create handlers
+    c_handler = logging.StreamHandler()
+    f_handler = logging.FileHandler(os.path.join(log_writer_path, 'log-' + time_string))
+    c_handler.setLevel(logging.WARNING)
+    f_handler.setLevel(logging.INFO)
+    f_handler.addFilter(MyFilter(logging.INFO))
+
+    # Create formatters and add it to handlers
+    c_format = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+    f_format = logging.Formatter('%(message)s')
+    c_handler.setFormatter(c_format)
+    f_handler.setFormatter(f_format)
+
+    # Add handlers to the logger
+    logger.addHandler(c_handler)
+    logger.addHandler(f_handler)
 
     # Trainer
-    trainer = Trainer(model, class_weights, writer, time_string, args, )
+    trainer = Trainer(model, logger, time_string, args)
 
     if args.eval_only is False:
         # Backup all py files[great SWE practice]
-        backup_files(time_string, args, None)
+        # backup_files(time_string, args, None)
         # Train
         trainer.train(train_loader, valid_loader, args)
 
     # Test
     print("Test accuracy", trainer.accuracy(test_loader))
+    logger.info("Test accuracy: {:.3f}".format(
+        self.accuracy(test_loader)))
 
     # Visualize outputs
     trainer.eval_output(train_loader, 'train')
