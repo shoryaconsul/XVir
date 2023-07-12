@@ -10,7 +10,7 @@ import numpy as np
 import torch
 import logging
 
-from utils.general_tools import get_args #, backup_files
+from utils.general_tools import get_args, backup_files
 # from utils.plotting import simple_plot, plot_labels
 from utils.train_tools import get_train_valid_test_data
 from utils.dataset import kmerDataset
@@ -91,7 +91,7 @@ def main(args):
 
     if args.eval_only is False:
         # Backup all py files[great SWE practice]
-        # backup_files(time_string, args, None)
+        backup_files(time_string, args, None)
         # Train
         trainer.train(train_loader, valid_loader, args)
 
@@ -101,9 +101,9 @@ def main(args):
         self.accuracy(test_loader)))
 
     # Visualize outputs
-    trainer.eval_output(train_loader, 'train')
-    trainer.eval_output(valid_loader, 'val')
-    trainer.eval_output(test_loader, 'test')
+    # trainer.eval_output(train_loader, 'train')
+    # trainer.eval_output(valid_loader, 'val')
+    # trainer.eval_output(test_loader, 'test')
 
 
 if __name__ == "__main__":

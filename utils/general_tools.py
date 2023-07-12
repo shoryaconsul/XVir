@@ -93,23 +93,21 @@ def backup_files(time_string, args, policy=None):
         os.makedirs(target_directory)
     # Store the arguments
     store_args(args, target_directory)
-    copyfile('utils/dataset.py',    os.path.join(target_directory, 'dataset.py'))
-    copyfile('utils/filtering.py',
-             os.path.join(target_directory, 'filtering.py'))
-    copyfile('utils/tools.py',    os.path.join(target_directory, 'tools.py'))
-    copyfile('utils/train_tools.py',
-             os.path.join(target_directory, 'train_tools.py'))
-    copyfile('main.py',    os.path.join(target_directory, 'main.py'))
-    copyfile('model.py',   os.path.join(target_directory, 'model.py'))
-    copyfile('trainer.py',   os.path.join(target_directory, 'trainer.py'))
-    environment_path = './DL-envs'
-    environment_name = 'DL-Project'
-    environment_path = os.path.join(environment_path, environment_name)
-    try:
-        copytree(environment_path, os.path.join(
-            target_directory, environment_name))
-    except:
-        pass
+    # copyfile('utils/dataset.py',    os.path.join(target_directory, 'dataset.py'))
+    # copyfile('utils/tools.py',    os.path.join(target_directory, 'tools.py'))
+    # copyfile('utils/train_tools.py',
+    #          os.path.join(target_directory, 'train_tools.py'))
+    # copyfile('main.py',    os.path.join(target_directory, 'main.py'))
+    # copyfile('model.py',   os.path.join(target_directory, 'model.py'))
+    # copyfile('trainer.py',   os.path.join(target_directory, 'trainer.py'))
+    # environment_path = './'
+    # environment_name = 'DL-Project'
+    # environment_path = os.path.join(environment_path, environment_name)
+    # try:
+    #     copytree(environment_path, os.path.join(
+    #         target_directory, environment_name))
+    # except:
+    #     pass
     try:
         torch_save(policy.state_dict(), os.path.join(
             args.model_save_path, + time_string + ".pt"))

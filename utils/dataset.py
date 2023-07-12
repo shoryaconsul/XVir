@@ -24,7 +24,7 @@ class Ngram(object):
     def __call__(self, sample):
         ngram_list = [sample[i:i+self.n] for i in range(len(sample)-self.n+1)]
         ngram_tensor = torch.stack(ngram_list).long()  # Each row is an N-gram
-        base_tensor = torch.pow(4, torch.arange(3, dtype=torch.long))
+        base_tensor = torch.pow(4, torch.arange(self.n, dtype=torch.long))
         ngram_val_tensor = torch.matmul(ngram_tensor-1, base_tensor)  # Converting tensor to int
 
         # return F.one_hot(ngram_val_tensor, num_classes=4**n)

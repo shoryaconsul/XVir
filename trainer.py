@@ -138,7 +138,7 @@ class Trainer(object):
         return correct / total
 
     def eval_output(self, loader, name):
-        df = pd.DataFrame(columns=[' ', 'actual'])
+        df = pd.DataFrame(columns=['Prediction ', 'Actual'])
         self.model.eval()
         with torch.no_grad():
             for x_val, y_val in tqdm(loader, desc='Processing '+name+' dataset'):
@@ -148,7 +148,8 @@ class Trainer(object):
                 actual = y_val
                 # predicted = predicted.view(batch_size, num_reads)
                 for i in range(batch_size):
-                    df.loc[len(df)] = [predicted[i], actual[i]]
+                    df.loc[len(df)] = [int(predicted[i].item()),
+                                    int(actual[i].item())]
         # Save as csv
         df.to_csv(self.args.model_path[:-3] + '-'+name+'-output.csv')
         print('Finished Evaluation')
