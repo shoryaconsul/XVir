@@ -1,16 +1,11 @@
 #!/usr/bin/env python3.8
-'''
-Written by: Saksham Consul 05/08/2023
-Script to create dataset from the raw data
-from datetime import datetime
-'''
+
 import os
 import numpy as np
 import argparse
-from datetime import datetime
 from tqdm import tqdm
 import bz2
-import pickle
+import _pickle as cPickle
 # from utils.plotting import plot_graph
 
 
@@ -47,9 +42,9 @@ def main(args):
     data_dict = {'reads': np.vstack((viral_reads, nonviral_reads)),
                 'labels': np.concatenate((viral_labels, nonviral_labels))}
     with bz2.BZ2File(output_pkl,'wb') as pfile:
-        pickle.dump(data_dict, pfile, protocol=4)
+        cPickle.dump(data_dict, pfile, protocol=4)
     
-    print('Data processing completed')
+    print('Data processing completed ')
 
 
 if __name__ == "__main__":
