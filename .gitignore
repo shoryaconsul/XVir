@@ -8,3 +8,4 @@ data/read2numeric
 test.py
 logs
  __pycache__
+ utils/ __pycache__
