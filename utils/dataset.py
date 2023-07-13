@@ -4,10 +4,41 @@ import os
 import numpy as np
 import bz2
 import _pickle as cPickle
+from tqdm import tqdm
 
 import torch
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, Subset
 from torch.nn import functional as F
+
+
+def store_data_split(filebase, dataset, name):
+    """
+    Store test, validation and test data splits in FASTA files
+    """
+
+    base_arr = np.array(['N', 'A', 'C', 'G', 'T'])
+    if not os.path.exists(filebase):
+        os.makedirs(filebase)
+
+    with open(os.path.join(filebase, name + '_data.fa'), 'w') as f:
+
+        if not isinstance(dataset, Dataset):
+            raise ValueError('dataset must be a Dataset or Subset object.')
+        elif isinstance(dataset, Subset):
+            reads = dataset.dataset.reads[np.array(dataset.indices)]
+            labels = dataset.dataset.labels[np.array(dataset.indices)]
+        else:
+            reads = dataset.reads
+            labels = dataset.labels
+
+        for x, y in tqdm(zip(reads, labels), total=len(dataset)):
+            if int(y) == 1:
+                read_header = '>HPVREF|' + str(np.random.randint(100))
+            else:
+                read_header = '>HUMREF|' + str(np.random.randint(100))
+            f.write(read_header + '\n')
+            f.write(''.join(base_arr[x.astype(int)]) + '\n')
+
 
 class Ngram(object):
     """
@@ -30,6 +61,7 @@ class Ngram(object):
         # return F.one_hot(ngram_val_tensor, num_classes=4**n)
         return ngram_val_tensor
 
+
 class kmerDataset(Dataset):
     """
     Tokenizing reads as a sequence of k-mers.
@@ -38,7 +70,10 @@ class kmerDataset(Dataset):
 
     def __init__(self, args, transform=Ngram):
         filename = os.path.join(args.data_path, args.data_file)
-        self.transform = transform(args.ngram)
+        if transform:
+            self.transform = transform(args.ngram)
+        else:
+            self.transform = None
 
         with bz2.open(filename, 'rb') as f:
             self.file = cPickle.load(f)

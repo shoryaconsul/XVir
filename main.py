@@ -1,9 +1,3 @@
-
-#!/usr/bin/env python3.8
-'''
-Written by: Saksham Consul 04/28/2023
-Cleaned up main.py
-'''
 import os
 import time
 import numpy as np
@@ -13,7 +7,7 @@ import logging
 from utils.general_tools import get_args, backup_files
 # from utils.plotting import simple_plot, plot_labels
 from utils.train_tools import get_train_valid_test_data
-from utils.dataset import kmerDataset
+from utils.dataset import kmerDataset, store_data_split
 
 from model import XVir
 from trainer import Trainer
@@ -36,6 +30,12 @@ def main(args):
     dataset = kmerDataset(args)
     train_dataset, valid_dataset, test_dataset, = get_train_valid_test_data(dataset, args)
 
+    split_base = os.path.join(args.data_path, 'split')
+    store_data_split(split_base, train_dataset, 'train')
+    store_data_split(split_base, valid_dataset, 'val')
+    store_data_split(split_base, test_dataset, 'test')
+    print('--------- Stored data splits ------------')
+
     # Dataloader
     train_loader = torch.utils.data.DataLoader(
         train_dataset, batch_size=args.batch_size, shuffle=True)
@@ -43,6 +43,8 @@ def main(args):
         valid_dataset, batch_size=args.batch_size, shuffle=True)
     test_loader = torch.utils.data.DataLoader(
         test_dataset, batch_size=args.batch_size, shuffle=True)
+
+
 
     # Model
     model = XVir(
@@ -57,7 +59,8 @@ def main(args):
         except FileNotFoundError:
             print("Model not found, exiting")
             exit(1)
-    # Create create tensorboard logs
+
+    # Create logs
     if args.eval_only:
         log_writer_path = './logs/eval'
     else:
@@ -95,10 +98,14 @@ def main(args):
         # Train
         trainer.train(train_loader, valid_loader, args)
 
-    # Test
-    print("Test accuracy", trainer.accuracy(test_loader))
-    logger.info("Test accuracy: {:.3f}".format(
-        self.accuracy(test_loader)))
+    # Test accuracy
+    test_acc = trainer.accuracy(test_loader)
+    print("Test accuracy: %.3f" %test_acc)
+    logger.info("Test accuracy: {:.3f}".format(test_acc))
+
+    auc = trainer.compute_roc(test_loader)
+    print("AUC of ROC curve: %.3f" %auc)
+    logger.info("AUC of ROC curve: {:.3f}".format(auc))
 
     # Visualize outputs
     # trainer.eval_output(train_loader, 'train')

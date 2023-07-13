@@ -3,10 +3,14 @@ import time
 import numpy as np
 import pandas as pd
 import random
+from sklearn.metrics import roc_auc_score, roc_curve
+
 import torch
 import torch.nn as nn
+
 from tqdm import tqdm
 import logging
+from matplotlib import pyplot as plt
 
 
 class Trainer(object):
@@ -15,7 +19,10 @@ class Trainer(object):
         self.model = model
         self.writer = writer
         if torch.cuda.is_available():
-            device = torch.device('cuda')
+            if 'cuda' in args.device:
+                device = torch.device(args.device)
+            else:
+                device = torch.device('cuda')
             print('---------Using GPU-------------------')
         else:
             device = torch.device('cpu')
@@ -120,9 +127,10 @@ class Trainer(object):
                 sub_time_str = time.strftime(
                     '%Y.%m.%d-%H-%M-%S', time.localtime(time.time()))
                 torch.save(self.model.state_dict(), os.path.join(
-                    model_save_path, 'XVir-' + self.timeStr + '_' + sub_time_str + ".pt"))
+                    model_save_path, self.timeStr + '_' + sub_time_str + ".pt"))
 
         print('Finished Training')
+
 
     def accuracy(self, loader):
         correct = 0
@@ -136,6 +144,34 @@ class Trainer(object):
                 correct += (predicted == y_val).sum().item()
             # print('Correct: %d, Total %d' %(correct, total))
         return correct / total
+
+
+    def compute_roc(self, loader):
+        self.model.eval()
+        y_true = []
+        y_prob = []
+        with torch.no_grad():
+            for x_val, y_val in loader:
+                y_true.extend(y_val.numpy())  # Store true labels
+
+                logits = self.model(x_val.to(self.device))
+                pred = torch.sigmoid(logits.detach().to('cpu'))
+                y_prob.extend(pred.numpy())
+
+        fpr, tpr, thresholds = roc_curve(y_true, y_prob)
+        roc_auc = roc_auc_score(y_true, y_prob)
+
+        target_directory = os.path.join(
+            os.path.dirname(self.args.model_save_path), self.timeStr)
+        zfile = os.path.join(target_directory, 'roc_res.npz')
+        np.savez(zfile, fpr=fpr, tpr=tpr)
+
+        fig_file = os.path.join(target_directory, 'roc.png')
+        plt.figure(figsize=(10, 10))
+        plt.plot(fpr, tpr, color='darkorange')
+        plt.savefig(fig_file)
+
+        return roc_auc
 
     def eval_output(self, loader, name):
         df = pd.DataFrame(columns=['Prediction ', 'Actual'])

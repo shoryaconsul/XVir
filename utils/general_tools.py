@@ -38,7 +38,7 @@ def get_args():
                         help='The input dimension, i.e., read length')
     parser.add_argument('--ngram', type=int, default=3,
                         help='Length of N-gram')
-    parser.add_argument('--model_dim', type=int, default=64,
+    parser.add_argument('--model-dim', type=int, default=64,
                         help='The embedding dimension of transformer')
     parser.add_argument('--num_layers', type=int, default=1,
                         help='The number of layers')
@@ -61,14 +61,14 @@ def get_args():
                         help='Only Evaluate the model')
     parser.add_argument('--load-model', type=bool, default=False,
                         help='Load Model')
-    parser.add_argument('--model-path', type=str, default='logs/experiment',
+    parser.add_argument('--model-path', type=str, default='logs/experiment/XVir.pt',
                         help='The path to load model')
     parser.add_argument('--model-save-interval',  type=int,
                         default=5, help='How often to save the model')
     parser.add_argument('--model-update-interval', type=int,
                         default=2, help='How often to update the model')
     parser.add_argument('--model-save-path', type=str,
-                        default='./logs/experiment/XVir_results.pt',
+                        default='./logs/experiment/XVir_models',
                         help='The path to save the trained model')
     parser.add_argument('--print-log-interval', type=int,
                         default=1, help='How often to print training logs')
@@ -87,7 +87,7 @@ def store_args(args, target_directory):
 
 
 def backup_files(time_string, args, policy=None):
-    target_directory = os.path.join('./logs/experiment', time_string)
+    target_directory = os.path.join(os.path.dirname(args.model_save_path), time_string)
 
     if not os.path.exists(target_directory):
         os.makedirs(target_directory)

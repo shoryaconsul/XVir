@@ -24,8 +24,9 @@ class XVir(nn.Module):
         ff_dim = 4*model_dim
         num_head = 4
 
-        self.ngram_embed = nn.Embedding(4**self.n, self.model_dim)
-        self.pos_embed = nn.Embedding(self.input_dim, self.model_dim)  # Configure position embeddings
+        self.ngram_embed = nn.Embedding(4**self.n, self.model_dim, max_norm=1.)
+        # Configure position embeddings
+        self.pos_embed = nn.Embedding(self.input_dim, self.model_dim, max_norm=1.)
         self.pos_embed.weight.requires_grad = False
         create_pos_embeddings(self.input_dim, self.model_dim, self.pos_embed.weight)
         self.LayerNorm = nn.LayerNorm(self.model_dim)

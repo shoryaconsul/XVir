@@ -4,6 +4,7 @@ data/*.pkl
 data/*.fa
 data/human_genome
 data/read2numeric
+data/split
 
 test.py
 logs
