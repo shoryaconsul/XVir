@@ -17,6 +17,12 @@ def get_args():
                         help='The path to load data')
     parser.add_argument('--data-file', type=str, default='proc_data.pkl',
                         help='The path to load data')
+    parser.add_argument('--train-data-file', type=str, default='split/train_data.pkl',
+                        help='The path to load train data')
+    parser.add_argument('--val-data-file', type=str, default='split/val_data.pkl',
+                        help='The path to load train data')
+    parser.add_argument('--test-data-file', type=str, default='split/test_data.pkl',
+                        help='The path to load train data')
     parser.add_argument('--train-split', type=float, default=0.8,
                         help='Train split')
     parser.add_argument('--valid-split', type=float, default=0.1,
@@ -26,7 +32,8 @@ def get_args():
                         default='XVir', help='Name of the experiment')
     # Basic arguments
     parser.add_argument('--device', type=str, default='cuda',
-                        help='What to use for compute [GPU, CPU]  will be called')
+                        help='What to use for compute [GPU, CPU] will be called. \
+                        Permitted values: cuda, cuda:[int], cpu')
     parser.add_argument('--seed',   type=int, default=4, help='Random seed')
     parser.add_argument('--num-processes', type=int, default=1,
                         help='The number of parallel processes used for training')

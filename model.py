@@ -45,10 +45,9 @@ class XVir(nn.Module):
         x_ngram = self.ngram_embed(x)
 
         pos_ids = torch.arange(self.input_dim, dtype=torch.long,
-                            device=x.get_device())
+                            device=x.device)
         pos_ids = pos_ids.unsqueeze(0).expand_as(x)  # (bs, max_seq_length)
         x_pos = self.pos_embed(pos_ids)
-
         x_embed = x_ngram + x_pos
         x_model = self.dropout(self.LayerNorm(x_embed))
         x_enc = self.xformEncoder(x_model)

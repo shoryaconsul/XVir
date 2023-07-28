@@ -68,8 +68,18 @@ class kmerDataset(Dataset):
     We initially set k = 3.
     """
 
-    def __init__(self, args, transform=Ngram):
-        filename = os.path.join(args.data_path, args.data_file)
+    def __init__(self, args, transform=Ngram, split=None):
+        if not split:
+            filename = os.path.join(args.data_path, args.data_file)
+        elif split == 'train':
+            filename = os.path.join(args.data_path, args.train_data_file)
+        elif split == 'val':
+            filename = os.path.join(args.data_path, args.val_data_file)
+        elif split == 'test':
+            filename = os.path.join(args.data_path, args.test_data_file)
+        else:
+            raise ValueError('Invalid split name.')
+
         if transform:
             self.transform = transform(args.ngram)
         else:

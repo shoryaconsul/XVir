@@ -1,3 +1,6 @@
+# This main is called when providing training, validation, and test data
+# separately to the training and evaluation modules.
+
 import os
 import time
 import numpy as np
@@ -27,14 +30,9 @@ def main(args):
         time.strftime('%Y.%m.%d-%H-%M-%S', time.localtime(time.time()))
 
     # Load data
-    dataset = kmerDataset(args)
-    train_dataset, valid_dataset, test_dataset, = get_train_valid_test_data(dataset, args)
-
-    split_base = os.path.join(args.data_path, 'split')
-    store_data_split(split_base, train_dataset, 'train')
-    store_data_split(split_base, valid_dataset, 'val')
-    store_data_split(split_base, test_dataset, 'test')
-    print('--------- Stored data splits ------------')
+    train_dataset = kmerDataset(args, split='train')
+    valid_dataset = kmerDataset(args, split='val')
+    test_dataset = kmerDataset(args, split='test')
 
     # Dataloader
     train_loader = torch.utils.data.DataLoader(

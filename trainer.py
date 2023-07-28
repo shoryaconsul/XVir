@@ -21,11 +21,16 @@ class Trainer(object):
         if torch.cuda.is_available():
             if 'cuda' in args.device:
                 device = torch.device(args.device)
+                print('---------Using GPU-------------------')
+            elif args.device == 'cpu':
+                device = torch.device('cpu')
+                print('---------Using CPU-------------------')
             else:
                 device = torch.device('cuda')
-            print('---------Using GPU-------------------')
+                print('---------Using GPU-------------------')
         else:
             device = torch.device('cpu')
+            print('---------Using CPU-------------------')
         self.device = device
         self.model.to(device)
         if device == torch.device('cuda'):
