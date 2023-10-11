@@ -21,7 +21,7 @@ int parseFASTQ(string fastq, vector<vector<int>>& seq_vec){
     string line;
     int k, cnt = 0;
     int newfile = 0;
-    bool seq_isnext = true;
+    bool seq_isnext = true, seq_valid = true;
     vector<int> seq;
 
     ifstream infile(fastq.c_str(), ios::in);
@@ -31,6 +31,7 @@ int parseFASTQ(string fastq, vector<vector<int>>& seq_vec){
         }
         else if(seq_isnext){  // Sequence line
             seq.clear();
+            seq_valid = true;
             for(int i=0; i<line.size(); i++){
                 switch(line[i]){
                     case 'A': case 'a':
@@ -45,10 +46,16 @@ int parseFASTQ(string fastq, vector<vector<int>>& seq_vec){
                     case 'T': case 't':
                         k = 4;
                         break;
+                    default:
+                        k = 0;
+                        seq_valid = false;
                 }
-                seq.push_back(k);
+                if(seq_valid) seq.push_back(k);  // store read
+                else break;  // stop parsing invalid read
             }
-            seq_vec.push_back(seq);
+            if(seq_valid){
+                seq_vec.push_back(seq);
+            }
             seq_isnext = false;
             cnt++;
 /*             if(cnt < 2){
