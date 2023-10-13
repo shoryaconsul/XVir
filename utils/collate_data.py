@@ -9,7 +9,7 @@ import _pickle as cPickle
 # from utils.plotting import plot_graph
 
 
-def main(args):
+def collate_viral_nonviral(args):
     # Set file paths
     raw_data_path = 'data/'
     viral_read_files = ['hpv_reads']
@@ -47,9 +47,36 @@ def main(args):
     print('Data processing completed ')
 
 
+def collate_reads(args):
+    reads = np.loadtxt(args.file)  # Load matrix from .txt file
+    if reads.shape[1] != args.length:  # Check that reads are of correct length
+        raise ValueError('Reads in %s are not %d bp.' %(args.file, args.length))
+    
+    read_labels = np.zeros(reads.shape[0], dtype=np.int8)
+    data_dict = {'reads': reads, 'labels': read_labels}
+
+    _, output_ext = os.path.splitext(args.output)  # Check that the output file is .pkl
+    if output_ext == '.pkl':
+        pfile = args.output
+    else:
+        pfile = args.output + '.pkl'
+    with bz2.BZ2File(pfile, 'wb') as pfile:
+        cPickle.dump(data_dict, pfile, protocol=4)
+    
+    print('Data processing completed ')
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-l', '--length', type=int, default=150,
                     help="Length of reads")
+    parser.add_argument('-f', '--file', type=str, default=None,
+                    help="File to collate data from")  # Use when only one file is needs to be processed
+    parser.add_argument('-o', '--output', type=str, default='data/data.pkl',
+                    help="Output file path")  # Only used when -f is specified
     args = parser.parse_args()
-    main(args)
+
+    if not args.file:
+        collate_viral_nonviral(args)
+    else:
+        collate_reads(args)
