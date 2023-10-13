@@ -43,9 +43,9 @@ def get_args():
     # Hyperparameters for Model
     parser.add_argument('--read_len', type=int, default=150,
                         help='The input dimension, i.e., read length')
-    parser.add_argument('--ngram', type=int, default=3,
+    parser.add_argument('--ngram', type=int, default=6,
                         help='Length of N-gram')
-    parser.add_argument('--model-dim', type=int, default=64,
+    parser.add_argument('--model-dim', type=int, default=128,
                         help='The embedding dimension of transformer')
     parser.add_argument('--num_layers', type=int, default=1,
                         help='The number of layers')
@@ -53,7 +53,7 @@ def get_args():
                         help='The batch size')
     parser.add_argument('--dropout', type=float, default=0.1,
                         help='The dropout rate')
-    parser.add_argument('--n-epochs', type=int, default=10,
+    parser.add_argument('--n-epochs', type=int, default=25,
                         help='The number of epochs')
     parser.add_argument('--learning-rate', type=float, default=1e-3,
                         help='The learning rate')
@@ -64,7 +64,7 @@ def get_args():
     # parser.add_argument('--use-class-weights', type=bool, default=False,
     #                     help='Use class weights')
     # Arguments for eval, logging, and printing
-    parser.add_argument('--eval-only', type=bool, default=False,
+    parser.add_argument('--eval-only', action='store_true',
                         help='Only Evaluate the model')
     parser.add_argument('--load-model', type=bool, default=False,
                         help='Load Model')
