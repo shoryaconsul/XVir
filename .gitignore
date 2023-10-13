@@ -12,3 +12,6 @@ __pycache__
 utils/ __pycache__
 
 deepvirfinder
+
+*.jpg
+*.png
