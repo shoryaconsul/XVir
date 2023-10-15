@@ -141,13 +141,18 @@ class Trainer(object):
         correct = 0
         total = 0
         self.model.eval()
+        prob = torch.empty(0)
         with torch.no_grad():
             for x_val, y_val in loader:
                 outputs = self.model(x_val.to(self.device))
-                predicted = (outputs.detach() > 0).float().to('cpu')  
+                predicted = (outputs.detach() > 0).float().to('cpu') 
                 total += y_val.size(0)
                 correct += (predicted == y_val).sum().item()
+                prob = torch.cat((prob, torch.sigmoid(predicted)), 0)
             # print('Correct: %d, Total %d' %(correct, total))
+        prob_sd, prob_mean = torch.std_mean(prob)
+        # print("Mean prediction probability: {:.3f}, Std: {:.3f}".format(prob_mean, prob_sd))
+        
         return correct / total
 
 

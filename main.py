@@ -26,23 +26,34 @@ def main(args):
     time_string = args.experiment_name + '-' + \
         time.strftime('%Y.%m.%d-%H-%M-%S', time.localtime(time.time()))
 
-    # Load data
-    dataset = kmerDataset(args)
-    train_dataset, valid_dataset, test_dataset, = get_train_valid_test_data(dataset, args)
+    if not args.eval_only:  # Training model
+        if args.split:  # Use provided data split
+            train_dataset = kmerDataset(args, split='train')
+            valid_dataset = kmerDataset(args, split='val')
+            test_dataset = kmerDataset(args, split='test')
 
-    split_base = os.path.join(args.data_path, 'split')
-    store_data_split(split_base, train_dataset, 'train')
-    store_data_split(split_base, valid_dataset, 'val')
-    store_data_split(split_base, test_dataset, 'test')
-    print('--------- Stored data splits ------------')
+        else:  # Split data into train, validation and test sets
+            dataset = kmerDataset(args)  # Load data
+            train_dataset, valid_dataset, test_dataset, = get_train_valid_test_data(dataset, args)
 
-    # Dataloader
-    train_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=args.batch_size, shuffle=True)
-    valid_loader = torch.utils.data.DataLoader(
-        valid_dataset, batch_size=args.batch_size, shuffle=True)
-    test_loader = torch.utils.data.DataLoader(
-        test_dataset, batch_size=args.batch_size, shuffle=True)
+            split_base = os.path.join(args.data_path, 'split')
+            store_data_split(split_base, train_dataset, 'train')
+            store_data_split(split_base, valid_dataset, 'val')
+            store_data_split(split_base, test_dataset, 'test')
+            print('--------- Stored data splits ------------')
+
+        # Dataloader
+        train_loader = torch.utils.data.DataLoader(
+            train_dataset, batch_size=args.batch_size, shuffle=True)
+        valid_loader = torch.utils.data.DataLoader(
+            valid_dataset, batch_size=args.batch_size, shuffle=True)
+        test_loader = torch.utils.data.DataLoader(
+            test_dataset, batch_size=args.batch_size, shuffle=True)
+    else:
+        dataset = kmerDataset(args)  # Load data
+        test_dataset = dataset
+        test_loader = torch.utils.data.DataLoader(
+            test_dataset, batch_size=args.batch_size, shuffle=True)
 
     # Model
     model = XVir(
@@ -101,10 +112,12 @@ def main(args):
     print("Test accuracy: %.3f" %test_acc)
     logger.info("Test accuracy: {:.3f}".format(test_acc))
 
-    auc = trainer.compute_roc(test_loader)
-    print("AUC of ROC curve: %.3f" %auc)
-    logger.info("AUC of ROC curve: {:.3f}".format(auc))
-
+    try:
+        auc = trainer.compute_roc(test_loader)
+        print("AUC of ROC curve: %.3f" %auc)
+        logger.info("AUC of ROC curve: {:.3f}".format(auc))
+    except ValueError:
+        print("Skipping ROC curve as the data contains only one class.")
     # Visualize outputs
     # trainer.eval_output(train_loader, 'train')
     # trainer.eval_output(valid_loader, 'val')

@@ -66,6 +66,8 @@ def get_args():
     # Arguments for eval, logging, and printing
     parser.add_argument('--eval-only', action='store_true',
                         help='Only Evaluate the model')
+    parser.add_argument('-s', '--split', action='store_true',
+                        help='Passing splits for training and testing')
     parser.add_argument('--load-model', type=bool, default=False,
                         help='Load Model')
     parser.add_argument('--model-path', type=str, default='logs/experiment/XVir.pt',
