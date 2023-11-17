@@ -4,7 +4,7 @@ import numpy as np
 import torch
 import logging
 
-from utils.general_tools import get_args, backup_files
+from utils.general_tools import get_args, backup_files, count_parameters
 # from utils.plotting import simple_plot, plot_labels
 from utils.train_tools import get_train_valid_test_data
 from utils.dataset import kmerDataset, store_data_split
@@ -60,6 +60,8 @@ def main(args):
         args.read_len, args.ngram, args.model_dim, args.num_layers, args.dropout
     )
 
+    print("Number of trainable parameters: ", count_parameters(model))
+
     # Load the trained model, if needed
     if args.load_model or args.eval_only:
         print("Loading model from", args.model_path)
@@ -101,19 +103,19 @@ def main(args):
     # Trainer
     trainer = Trainer(model, logger, time_string, args)
 
+    backup_files(time_string, args, None)
     if args.eval_only is False:
         # Backup all py files[great SWE practice]
-        backup_files(time_string, args, None)
         # Train
         trainer.train(train_loader, valid_loader, args)
 
     # Test accuracy
-    test_acc = trainer.accuracy(test_loader)
+    test_acc = trainer.accuracy(test_loader, True)
     print("Test accuracy: %.3f" %test_acc)
     logger.info("Test accuracy: {:.3f}".format(test_acc))
 
     try:
-        auc = trainer.compute_roc(test_loader)
+        auc = trainer.compute_roc(test_loader, True)
         print("AUC of ROC curve: %.3f" %auc)
         logger.info("AUC of ROC curve: {:.3f}".format(auc))
     except ValueError:
