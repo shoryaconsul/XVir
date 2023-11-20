@@ -20,13 +20,13 @@ def get_args():
     parser.add_argument('--train-data-file', type=str, default='split/train_data.pkl',
                         help='The path to load train data')
     parser.add_argument('--val-data-file', type=str, default='split/val_data.pkl',
-                        help='The path to load train data')
+                        help='The path to load validation data')
     parser.add_argument('--test-data-file', type=str, default='split/test_data.pkl',
-                        help='The path to load train data')
+                        help='The path to load test data')
     parser.add_argument('--train-split', type=float, default=0.8,
                         help='Train split')
     parser.add_argument('--valid-split', type=float, default=0.1,
-                        help='Valid split')
+                        help='Validation split')
     # Experiment arguments
     parser.add_argument('--experiment-name', type=str,
                         default='XVir', help='Name of the experiment')
