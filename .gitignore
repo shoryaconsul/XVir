@@ -5,6 +5,10 @@ data/*.fa
 data/human_genome
 data/read2numeric
 data/split
+data/contaminant_genomes.fna
+data/contaminant_genomes/
+data/prevalence/                                                                                                        data/reads.zip
+data/reads/
 
 test.py
 logs
@@ -12,6 +16,7 @@ __pycache__
 utils/ __pycache__
 
 deepvirfinder
+virtifier
 
 *.jpg
 *.png
