@@ -11,7 +11,7 @@ data/prevalence/
 data/reads/
 
 test.py
-logs
+logs/*
 __pycache__
 utils/ __pycache__
 
