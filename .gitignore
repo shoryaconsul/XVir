@@ -20,5 +20,6 @@ virtifier
 
 *.jpg
 *.png
-
 *_v2*
+
+!logs/experiment/XVir_models/XVir_150bp_model.pt
