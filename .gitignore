@@ -22,4 +22,4 @@ virtifier
 *.png
 *_v2*
 
-!logs/experiment/XVir_models/XVir_150bp_model.pt
+!logs/XVir_150bp_model.pt
