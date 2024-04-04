@@ -7,7 +7,7 @@ data/read2numeric
 data/split
 data/contaminant_genomes.fna
 data/contaminant_genomes/
-data/prevalence/                                                                                                        data/reads.zip
+data/prevalence/
 data/reads/
 
 test.py

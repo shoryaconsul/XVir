@@ -43,6 +43,11 @@ def main(args):
             print('--------- Stored data splits ------------')
 
         # Dataloader
+        # print("Size of training set: %d" %len(train_dataset))
+        train_dataset.dimerize()
+        # print("Size of training set after adding reverse complement reads: %d"
+        #         %len(train_dataset))
+
         train_loader = torch.utils.data.DataLoader(
             train_dataset, batch_size=args.batch_size, shuffle=True)
         valid_loader = torch.utils.data.DataLoader(

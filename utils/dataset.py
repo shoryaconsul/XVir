@@ -89,6 +89,7 @@ class kmerDataset(Dataset):
             self.file = cPickle.load(f)
         self.reads = self.file['reads']
         self.labels = self.file['labels']
+
         self.data = torch.from_numpy(self.reads)
         self.y = torch.from_numpy(self.labels).unsqueeze(-1).float()
 
@@ -107,3 +108,17 @@ class kmerDataset(Dataset):
 
     def __len__(self):
         return self.y.shape[0]
+
+    def dimerize(self):
+        """
+        Augment the dataset by adding reverse complement of each read.
+        The label is preserved as one would expect the reverse complement
+        of a read to belong to the same class.
+        """
+
+        revcomp_reads = np.fliplr(5 - self.reads)
+        self.reads = np.vstack((self.reads, revcomp_reads))
+        self.data = torch.from_numpy(self.reads)
+        self.labels = np.tile(self.labels, 2)
+        self.y = torch.from_numpy(self.labels).unsqueeze(-1).float()
+
