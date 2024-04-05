@@ -21,5 +21,7 @@ virtifier
 *.jpg
 *.png
 *_v2*
-
+150bp_cancer/*
+150bp_cancer.zip
+launch.json
 !logs/XVir_150bp_model.pt

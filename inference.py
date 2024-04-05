@@ -16,9 +16,11 @@ def parse_fasta(filename):
                 break
             elif line[0] == '>':  # Parse sequence data
                 read_header = line[1:].rstrip()
-                labels.append(read_header)
                 read_seq = f.readline().rstrip().upper()
+                if 'N' in read_seq:
+                    continue
                 read_seq = np.array([base2int[base] for base in read_seq])
+                labels.append(read_header)
                 reads.append(read_seq)
             else:
                 pass # For completeness
