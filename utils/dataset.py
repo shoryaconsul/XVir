@@ -122,3 +122,23 @@ class kmerDataset(Dataset):
         self.labels = np.tile(self.labels, 2)
         self.y = torch.from_numpy(self.labels).unsqueeze(-1).float()
 
+class inferenceDataset(Dataset):
+    def __init__(self, args, reads, labels):
+        self.transform = Ngram(args.ngram)
+        self.data = torch.from_numpy(reads)
+        self.labels = labels
+        self.length = len(reads)
+
+    def __getitem__(self, index):
+        """
+            Return read for index
+        """
+        x = self.data[index, ...]
+
+        if self.transform:
+            x = self.transform(x)
+
+        return x, self.labels[index]
+    
+    def __len__(self):
+        return self.length
