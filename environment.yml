@@ -1,4 +1,5 @@
 name: XVir
+name: XVir
 channels:
   - defaults
 dependencies:
