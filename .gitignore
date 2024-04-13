@@ -25,3 +25,4 @@ virtifier
 150bp_cancer.zip
 launch.json
 !logs/XVir_150bp_model.pt
+multi_species_test/
