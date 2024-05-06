@@ -9,6 +9,9 @@ data/contaminant_genomes.fna
 data/contaminant_genomes/
 data/prevalence/
 data/reads/
+data/mixture
+data/reads.zip
+
 
 test.py
 logs/*
