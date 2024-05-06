@@ -109,6 +109,9 @@ class kmerDataset(Dataset):
     def __len__(self):
         return self.y.shape[0]
 
+    def num_class(self):
+        return len(np.unique(self.labels))
+
     def dimerize(self):
         """
         Augment the dataset by adding reverse complement of each read.
@@ -121,6 +124,7 @@ class kmerDataset(Dataset):
         self.data = torch.from_numpy(self.reads)
         self.labels = np.tile(self.labels, 2)
         self.y = torch.from_numpy(self.labels).unsqueeze(-1).float()
+
 
 class inferenceDataset(Dataset):
     def __init__(self, args, reads, labels):

@@ -43,10 +43,7 @@ def main(args):
             print('--------- Stored data splits ------------')
 
         # Dataloader
-        # print("Size of training set: %d" %len(train_dataset))
         train_dataset.dimerize()
-        # print("Size of training set after adding reverse complement reads: %d"
-        #         %len(train_dataset))
 
         train_loader = torch.utils.data.DataLoader(
             train_dataset, batch_size=args.batch_size, shuffle=True)
@@ -114,22 +111,32 @@ def main(args):
         # Train
         trainer.train(train_loader, valid_loader, args)
 
-    # Test accuracy
-    test_acc = trainer.accuracy(test_loader, True)
-    print("Test accuracy: %.3f" %test_acc)
-    logger.info("Test accuracy: {:.3f}".format(test_acc))
+    # Test accuracy and AUROC
+    if not args.multiviral:
+        test_acc = trainer.accuracy(test_loader, True)
+        print("Test accuracy: %.3f" %test_acc)
+        logger.info("Test accuracy: {:.3f}".format(test_acc))
 
-    try:
-        auc = trainer.compute_roc(test_loader, True)
-        print("AUC of ROC curve: %.3f" %auc)
-        logger.info("AUC of ROC curve: {:.3f}".format(auc))
-    except ValueError:
-        print("Skipping ROC curve as the data contains only one class.")
-    # Visualize outputs
-    # trainer.eval_output(train_loader, 'train')
-    # trainer.eval_output(valid_loader, 'val')
-    # trainer.eval_output(test_loader, 'test')
+        try:
+            auc = trainer.compute_roc(test_loader, True)
+            print("AUC of ROC curve: %.3f" %auc)
+            logger.info("AUC of ROC curve: {:.3f}".format(auc))
+        except ValueError:
+            print("Skipping ROC curve as the data contains only one class.")
 
+    # Compute accuracy per class (only for multiviral case)
+    else:
+        test_dataset = kmerDataset(args)
+        test_loader = torch.utils.data.DataLoader(
+        test_dataset, batch_size=args.batch_size, shuffle=False)
+        
+        num_classes = test_dataset.num_class()
+        print("Number of classes: ", num_classes)
+        class_acc = trainer.accuracy_per_class(test_loader, num_classes)
+        print("Accuracy per class: ", class_acc)
+
+        # class_auc = trainer.compute_roc_per_class(test_loader, num_classes)
+        # print("AUC of ROC curve per class: ", class_auc)
 
 if __name__ == "__main__":
     args = get_args()

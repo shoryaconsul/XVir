@@ -71,7 +71,7 @@ if __name__ == "__main__":
     parser.add_argument('-l', '--length', type=int, default=150,
                     help="Length of reads")
     parser.add_argument('-f', '--file', type=str, default=None,
-                    help="File to collate data from")  # Use when only one file is needs to be processed
+                    help="File to collate data from")  # Use when only one file needs to be processed
     parser.add_argument('-o', '--output', type=str, default='data/data.pkl',
                     help="Output file path")  # Only used when -f is specified
     args = parser.parse_args()

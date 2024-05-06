@@ -17,10 +17,11 @@ def parse_fasta(args):
         for line in f:
             line = line.strip()
             if line.startswith('>'):  # Header
-                if 'HPV' in line:  # Viral read
+                if 'HPV' in line or 'VIR' in line:  # Viral read
                     y = 1
                 else:  # Non-viral read
                     y = 0
+                head = line
             else:  # Read sequence
                 if(len(line) != args.length):  # Skip reads that are not of specified length
                     print('Read length not equal to specified length')

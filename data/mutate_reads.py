@@ -72,7 +72,7 @@ if __name__ == "__main__":
                 header = lines.strip()
             else:
                 read = lines.strip()
-                if 'HPV' in header:  # Mutate only viral reads
+                if 'HPV' in header or 'VIR' in header:  # Mutate only viral reads
                     is_mutated = False
                     while not is_mutated:
                         is_mutated, mutated_read = mutate_read(

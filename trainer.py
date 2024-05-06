@@ -192,19 +192,45 @@ class Trainer(object):
 
         return roc_auc
 
-    def eval_output(self, loader, name):
-        df = pd.DataFrame(columns=['Prediction ', 'Actual'])
+
+    def accuracy_per_class(self, loader, num_class):
+        match_cnt = np.zeros(num_class)
+        total_cnt = np.zeros(num_class)
+
         self.model.eval()
+        prob = torch.empty(0)
         with torch.no_grad():
-            for x_val, y_val in tqdm(loader, desc='Processing '+name+' dataset'):
+            for x_val, y_val in loader:
                 outputs = self.model(x_val.to(self.device))
                 predicted = (outputs.detach() > 0).float().to('cpu')
-                batch_size, _ = y_val.shape
-                actual = y_val
-                # predicted = predicted.view(batch_size, num_reads)
-                for i in range(batch_size):
-                    df.loc[len(df)] = [int(predicted[i].item()),
-                                    int(actual[i].item())]
-        # Save as csv
-        df.to_csv(self.args.model_path[:-3] + '-'+name+'-output.csv')
-        print('Finished Evaluation')
+                for i in range(num_class):
+                    match_cnt[i] += (predicted[y_val == i] == (y_val[y_val == i] > 0).float()).sum().item()
+                    total_cnt[i] += y_val[y_val == i].size(0)
+        
+        return match_cnt / total_cnt
+
+
+    # def compute_roc_per_class(self, loader, num_class):
+    #     self.model.eval()
+    #     y_true = []
+    #     y_prob = []
+    #     with torch.no_grad():
+    #         for x_val, y_val in loader:
+    #             y_true.extend(y_val.numpy())  # Store true labels
+
+    #             logits = self.model(x_val.to(self.device))
+    #             pred = torch.sigmoid(logits.detach().to('cpu'))
+    #             y_prob.extend(pred.numpy())
+
+    #     auc_per_class = []
+    #     y_true = np.array(y_true)
+    #     y_prob = np.array(y_prob)
+    #     for i in range(num_class):  # Compute AUROC for each class
+    #         yi_true = (y_true[y_true == i] > 0).astype(int)
+    #         yi_prob = y_prob[y_true == i]
+    #         try:
+    #             roc_auc = roc_auc_score(yi_true, yi_prob)
+    #         except ValueError:
+    #             auc_per_class.append(1.)
+
+    #     return auc_per_class

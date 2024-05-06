@@ -68,6 +68,8 @@ def get_args():
     # Arguments for eval, logging, and printing
     parser.add_argument('--eval-only', action='store_true',
                         help='Only Evaluate the model')
+    parser.add_argument('--multiviral', action='store_true',
+                        help='Evaluate metrics on test data per viral class')
     parser.add_argument('-s', '--split', action='store_true',
                         help='Passing splits for training and testing')
     parser.add_argument('--load-model', type=bool, default=False,
