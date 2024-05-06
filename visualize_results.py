@@ -22,9 +22,10 @@ class Args:
         self.num_layers = 1
         self.dropout = 0.1
         self.batch_size = 100
-        self.model_path="logs/experiment/XVir_models/XVir-2023.10.27-01-08-29/XVir-2023.10.27-01-08-29_2023.10.27-04-07-36.pt"
+        # self.model_path="logs/experiment/XVir_models/XVir-2023.10.27-01-08-29/XVir-2023.10.27-01-08-29_2023.10.27-04-07-36.pt"
         # self.model_path = 'logs/experiment/XVir_models/XVir-2023.07.13-01-19-21/'\
         #     'XVir-2023.07.13-01-19-21_2023.07.13-03-37-18.pt'
+        self.model_path = 'logs/experiment/XVir_models/XVir-2024.03.24-19-58-12/XVir-2024.03.24-19-58-12_2024.03.25-00-57-34.pt'
         self.data_path = 'data/split'
         self.data_file = 'test_data.pkl'
 
