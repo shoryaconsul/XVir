@@ -42,14 +42,16 @@ The YAML file `environment.yml` specifies the dependencies reqired to run XVir a
 Set up the required environment variables by runing `source setup.sh`.
 
 ### Inference Only
-To use a trained XVir model for inference, we've included an `inference.py` script
-We've provided the model weights for the base 150bp model in the /logs/ folder. Given a fasta file with 150bp reads, you may call it as:
+To use a trained XVir model for inference, we've included an `inference.py` script.
+We have also provided the model weights for the base 150bp model in the /logs/ folder. Given a FASTA file with 150bp reads, you may call it as:
 
 `python inference.py --model_path=./logs/XVir_150bp_model.pt --input=./path/to/fasta.fa`
 
 This will create a fasta.fa.output.txt in the same location as the input, containing the name of each read along with the probability that the read is HPV positive.
 For other models, you can also specify the flags `--read_len`, `--ngram`, `--model_dim`, and `--num_layers` (as in `main.py`)
 Inference batch size can be changed from the default (100) with `--batch_size` and GPU can be enabled by passing `--cuda`
+
+**Alternatively**, the user can use the `eval-only` flag to run inference on XVir. See `commands.sh` for an example of this. This offers greater flexibility in terms fo the format of the input files.
 
 ### Training XVir on User Data (Recommended)
 The script `main.py` is the primary entry point for the XVir pipeline. It includes the functionality for training, testing, and validating an XVir model on custom data.
@@ -92,7 +94,7 @@ The command line options for XVir are outlined below. The default values of thes
 |--model-path |     Relative path to load model             | logs/experiment/XVir.pt' |
 |--model-save-interval |     How often (in epochs) to save the model             | 5|
 |--model-update-interval |     How often (in epochs) to update the model             | 2 |
-|--model-save-path |     Directory to save the trained model             | './logs/experiment/XVir_models'  |
+|--model-save-path |     Directory to save the trained model             | 'logs/experiment/XVir_models'  |
 |--print-log-interval |     How often (in epochs) to print training logs  |1 |
 |--val-log-interval |    How often (in epochs) to print validation logs | 5 |
 
