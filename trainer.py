@@ -51,6 +51,7 @@ class Trainer(object):
             random.seed(seed)
 
     def train(self, train_loader, val_loader, args):
+        print("Starting training")
         batch_size = args.batch_size
         n_epochs = args.n_epochs
         model_save_path = os.path.join(args.model_save_path, self.timeStr)
@@ -60,7 +61,7 @@ class Trainer(object):
         # Start training
         training_loss = []
         for epoch in tqdm(range(1, n_epochs + 1)):
-            # print('Epoch %d of %d' %(epoch, n_epochs))
+            print('Epoch %d of %d' %(epoch, n_epochs))
             running_loss = 0.0
             batch_losses = []
             c = 0
@@ -68,7 +69,7 @@ class Trainer(object):
                 # zero the parameter gradients
                 self.optimizer.zero_grad()
                 # forward + backward + optimize
-                outputs = self.model(x_batch.to(self.device))
+                outputs = self.model(x_batch.to(self.device), args.mask_rate)
                 batch_size, _ = y_batch.shape
                 loss = self.criterion(outputs, y_batch.to(self.device))
                 if loss.isnan().any():
@@ -137,26 +138,33 @@ class Trainer(object):
         print('Finished Training')
 
 
-    def accuracy(self, loader):
-        correct = 0
-        total = 0
+    def accuracy(self, loader, test=False):
+        true_neg, true_pos = 0, 0
+        total_neg, total_pos = 0, 0
         self.model.eval()
         prob = torch.empty(0)
         with torch.no_grad():
             for x_val, y_val in loader:
                 outputs = self.model(x_val.to(self.device))
                 predicted = (outputs.detach() > 0).float().to('cpu') 
-                total += y_val.size(0)
-                correct += (predicted == y_val).sum().item()
+                total_neg += y_val[y_val == 0].size(0)
+                total_pos += y_val[y_val == 1].size(0)
+                true_neg += (predicted[y_val == 0] == y_val[y_val == 0]).sum().item()
+                true_pos += (predicted[y_val == 1] == y_val[y_val == 1]).sum().item()
                 prob = torch.cat((prob, torch.sigmoid(predicted)), 0)
             # print('Correct: %d, Total %d' %(correct, total))
         prob_sd, prob_mean = torch.std_mean(prob)
         # print("Mean prediction probability: {:.3f}, Std: {:.3f}".format(prob_mean, prob_sd))
         
-        return correct / total
+        if test:  # Compute TPR, TNR and PPV
+            tpr = true_pos / total_pos
+            tnr = true_neg / total_neg
+            ppv = true_pos / (true_pos + (total_neg - true_neg))
+            print("TPR: {:.3f}, TNR: {:.3f}, PPV: {:.3f}".format(tpr, tnr, ppv))
+        return (true_neg + true_pos) / (total_neg + total_pos)
 
 
-    def compute_roc(self, loader):
+    def compute_roc(self, loader, save=True):
         self.model.eval()
         y_true = []
         y_prob = []
@@ -171,31 +179,58 @@ class Trainer(object):
         fpr, tpr, thresholds = roc_curve(y_true, y_prob)
         roc_auc = roc_auc_score(y_true, y_prob)
 
-        target_directory = os.path.join(
-            os.path.dirname(self.args.model_save_path), self.timeStr)
-        zfile = os.path.join(target_directory, 'roc_res.npz')
-        np.savez(zfile, fpr=fpr, tpr=tpr)
+        if save:
+            target_directory = os.path.join(
+                os.path.dirname(self.args.model_save_path), self.timeStr)
+            zfile = os.path.join(target_directory, 'roc_res.npz')
+            np.savez(zfile, fpr=fpr, tpr=tpr)
 
-        fig_file = os.path.join(target_directory, 'roc.png')
-        plt.figure(figsize=(10, 10))
-        plt.plot(fpr, tpr, color='darkorange')
-        plt.savefig(fig_file)
+            fig_file = os.path.join(target_directory, 'roc.png')
+            plt.figure(figsize=(10, 10))
+            plt.plot(fpr, tpr, color='darkorange')
+            plt.savefig(fig_file)
 
         return roc_auc
 
-    def eval_output(self, loader, name):
-        df = pd.DataFrame(columns=['Prediction ', 'Actual'])
+
+    def accuracy_per_class(self, loader, num_class):
+        match_cnt = np.zeros(num_class)
+        total_cnt = np.zeros(num_class)
+
         self.model.eval()
+        prob = torch.empty(0)
         with torch.no_grad():
-            for x_val, y_val in tqdm(loader, desc='Processing '+name+' dataset'):
+            for x_val, y_val in loader:
                 outputs = self.model(x_val.to(self.device))
                 predicted = (outputs.detach() > 0).float().to('cpu')
-                batch_size, _ = y_val.shape
-                actual = y_val
-                # predicted = predicted.view(batch_size, num_reads)
-                for i in range(batch_size):
-                    df.loc[len(df)] = [int(predicted[i].item()),
-                                    int(actual[i].item())]
-        # Save as csv
-        df.to_csv(self.args.model_path[:-3] + '-'+name+'-output.csv')
-        print('Finished Evaluation')
+                for i in range(num_class):
+                    match_cnt[i] += (predicted[y_val == i] == (y_val[y_val == i] > 0).float()).sum().item()
+                    total_cnt[i] += y_val[y_val == i].size(0)
+        
+        return match_cnt / total_cnt
+
+
+    # def compute_roc_per_class(self, loader, num_class):
+    #     self.model.eval()
+    #     y_true = []
+    #     y_prob = []
+    #     with torch.no_grad():
+    #         for x_val, y_val in loader:
+    #             y_true.extend(y_val.numpy())  # Store true labels
+
+    #             logits = self.model(x_val.to(self.device))
+    #             pred = torch.sigmoid(logits.detach().to('cpu'))
+    #             y_prob.extend(pred.numpy())
+
+    #     auc_per_class = []
+    #     y_true = np.array(y_true)
+    #     y_prob = np.array(y_prob)
+    #     for i in range(num_class):  # Compute AUROC for each class
+    #         yi_true = (y_true[y_true == i] > 0).astype(int)
+    #         yi_prob = y_prob[y_true == i]
+    #         try:
+    #             roc_auc = roc_auc_score(yi_true, yi_prob)
+    #         except ValueError:
+    #             auc_per_class.append(1.)
+
+    #     return auc_per_class

@@ -24,5 +24,5 @@ RCNT=`expr $READCNT / $NUM_GENOME`
 # echo $READCNT
 # echo $NUM_GENOME
 echo $RCNT
-$ART -na -q -i $REF -l 150 --seqSys HS25 --rcount $RCNT -o $OUTPATH
-# $ART -na -q -i $REF -l 100 --seqSys MSv3 --rcount $RCNT -o $OUTPATH
+# $ART -na -q -i $REF -l 150 --seqSys HS25 --rcount $RCNT -o $OUTPATH
+$ART -na -q -i $REF -l 150 --seqSys MSv3 --rcount $RCNT -o $OUTPATH -nf 1

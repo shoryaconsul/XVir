@@ -5,13 +5,27 @@ data/*.fa
 data/human_genome
 data/read2numeric
 data/split
+data/contaminant_genomes.fna
+data/contaminant_genomes/
+data/prevalence/
+data/reads/
+data/mixture
+data/reads.zip
+main_subset.py
 
 test.py
-logs
+logs/*
 __pycache__
 utils/ __pycache__
+requirements.txt
 
 deepvirfinder
+virtifier
 
 *.jpg
 *.png
+*_v2*
+150bp_cancer/*
+150bp_cancer.zip
+launch.json
+!logs/XVir_150bp_model.pt

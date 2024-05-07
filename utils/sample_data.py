@@ -25,7 +25,7 @@ def parse_fasta(filename):
                 read_seq = np.array([base2int[base] for base in read_seq])
                 reads.append(read_seq)
             else:
-                pass # FOr completeness
+                pass # For completeness
     return np.array(reads), np.array(labels)
 
 

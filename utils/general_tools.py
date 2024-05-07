@@ -47,12 +47,14 @@ def get_args():
                         help='Length of N-gram')
     parser.add_argument('--model-dim', type=int, default=128,
                         help='The embedding dimension of transformer')
-    parser.add_argument('--num_layers', type=int, default=1,
+    parser.add_argument('--num-layers', type=int, default=1,
                         help='The number of layers')
-    parser.add_argument('--batch_size', type=int, default=100,
+    parser.add_argument('--batch-size', type=int, default=100,
                         help='The batch size')
     parser.add_argument('--dropout', type=float, default=0.1,
                         help='The dropout rate')
+    parser.add_argument('--mask-rate', type=float, default=None,
+                        help='The masking rate')
     parser.add_argument('--n-epochs', type=int, default=25,
                         help='The number of epochs')
     parser.add_argument('--learning-rate', type=float, default=1e-3,
@@ -66,6 +68,8 @@ def get_args():
     # Arguments for eval, logging, and printing
     parser.add_argument('--eval-only', action='store_true',
                         help='Only Evaluate the model')
+    parser.add_argument('--multiviral', action='store_true',
+                        help='Evaluate metrics on test data per viral class')
     parser.add_argument('-s', '--split', action='store_true',
                         help='Passing splits for training and testing')
     parser.add_argument('--load-model', type=bool, default=False,
@@ -122,3 +126,6 @@ def backup_files(time_string, args, policy=None):
             args.model_save_path, + time_string + ".pt"))
     except:
         pass
+
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
