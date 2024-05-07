@@ -11,12 +11,13 @@ data/prevalence/
 data/reads/
 data/mixture
 data/reads.zip
-
+main_subset.py
 
 test.py
 logs/*
 __pycache__
 utils/ __pycache__
+requirements.txt
 
 deepvirfinder
 virtifier
