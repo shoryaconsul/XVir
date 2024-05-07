@@ -1,9 +1,9 @@
-# XVir
-Transformer-based classifier for viral read identification in cancerous samples
+# XVir: A Transformer-Based Architecture for Identifying Viral Reads from Cancer Samples
+**Authors:** Shorya Consul, John Robertson, Haris Vikalo
 
 ## Requirements
 
-Feel free to update your `environment.yml` file. I've provided one example file. To create the environment run `conda env create -f environment.yml`
+The YAML file `environment.yml` specifies the dependencies reqired to run XVir and competing benchmarks ([DeepVirFiner](https://github.com/jessieren/DeepVirFinder) and [Virtifier](https://github.com/crazyinter/Seq2Vec)). I've provided one example file. To create the environment run `conda env create -f environment.yml`
 
 ### File Structure
 ```
@@ -21,18 +21,25 @@ Feel free to update your `environment.yml` file. I've provided one example file.
   - fastq2fasta.sh          : Bash script to create FASTA files corresponding to input FASTQ files
   
 
-- data/                 : Place to store data
-- logs/                 : Place where logs will be saved
-- model.py              : GRU Model
+- data/                 : Place to store data. Additional documentation can be found in the README
+                          included in the _data_ directory.
+- logs/                 : Place where logs and model weights will be saved. 
+                          The model weights for the 150bp model have been included. 
+- model.py              : XVir model specification
 - main.py               : Main script
-- trainer.py            : Script for trainer
+- trainer.py            : Script for trainer. Invoked whenever training XVir.
 - __init__.py           : Needed for python packaging
 - environment.yml       : Dependencies for environment
+
+- setup.sh              : Script to set up environment variables
+- visualize_results.py  : Visualize results of chosen model
 
 - LICENSE
 - README.md
 ```
 ## To Run
+
+Set up the required environment variables by runing `source setup.sh`.
 
 ### Inference Only
 To use a trained XVir model for inference, we've included an `inference.py` script
@@ -49,4 +56,7 @@ The script `main.py` is the primary entry point for the XVir pipeline. It includ
 
 `python main.py <args>`
 
-The full list of arguments can be found in `utils/general_tools.py`, along with the default values for creating our XVir model. To prepare your data for training, please see the tools we've provided in the `data/` folder.
+For example, when specifying training, test and validation sets, XVir can be trained by running
+`python main.py -s --train-data-file train_data.pkl --val-data-file val_data.pkl --test-data-file test_data.pkl --data-path data/ --device cuda`
+
+The full list of arguments can be found in `utils/general_tools.py`, along with the default values for creating our XVir model. To prepare your data for training, please see the tools we've provided in the `data` folder.
