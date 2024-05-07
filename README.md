@@ -3,7 +3,7 @@
 
 ## Requirements
 
-The YAML file `environment.yml` specifies the dependencies reqired to run XVir and competing benchmarks ([DeepVirFiner](https://github.com/jessieren/DeepVirFinder) and [Virtifier](https://github.com/crazyinter/Seq2Vec)). I've provided one example file. To create the environment run `conda env create -f environment.yml`
+The YAML file `environment.yml` specifies the dependencies reqired to run XVir and competing benchmarks ([DeepVirFiner](https://github.com/jessieren/DeepVirFinder) and [Virtifier](https://github.com/crazyinter/Seq2Vec)). To create the environment run `conda env create -f environment.yml`
 
 ### File Structure
 ```
@@ -61,7 +61,7 @@ The script `main.py` is the primary entry point for the XVir pipeline. It includ
 For example, when specifying training, test and validation sets, XVir can be trained by running
 `python main.py -s --train-data-file train_data.pkl --val-data-file val_data.pkl --test-data-file test_data.pkl --data-path data/ --device cuda`
 
-To prepare your data for training, please see the tools we've provided in the `data` folder.
+To prepare your data for training, please see the tools we have provided in the `data` folder.
 
 ### Command line arguments
 The command line options for XVir are outlined below. The default values of these arguments, used to create our XVir model, can be found in `utils/general_tools.py`.
