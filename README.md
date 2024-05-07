@@ -65,7 +65,7 @@ To prepare your data for training, please see the tools we've provided in the `d
 The command line options for XVir are outlined below. The default values of these arguments, used to create our XVir model, can be found in `utils/general_tools.py`.
 
 | Argument    | Description | Default | 
-| :---        |    :-------:   |           :---: |
+| :---        |    :---------   |           :---: |
 |   --data-path    |   The path to load data | 'data' |
 |  --data-file  |     The relative path of data file from data-path |  'proc_data.pkl' |
 |  --train-data-file   |  Relative path of training data file | ('split/train_data.pkl' |
@@ -74,26 +74,25 @@ The command line options for XVir are outlined below. The default values of thes
 |  --train-split  |  Fraction of data to use for training | 0.8  |
 |--valid-split | Fraction of data to use for validation  | 0.1 |
 |--experiment-name | Name of the experiment  | 'XVir' |
-|--device |     What to use for compute [GPU, CPU] will be called. | 'cuda' (Can specify 'cuda:[int]'|
-|--seed |    Random seed              | int (4)* |
-|--num-processes |    The number of parallel processes used for training              | int (1)* |
-|--read_len |     The input dimension, i.e., read length             | int (150)* |
-|--ngram |      Length of N-gram          | int (6)*  |
-|--model-dim |    The embedding dimension of transformer              | int (128)* |
-|--num-layers |     The number of layers             | int (1)* |
-|--batch-size |    The batch size              | int (100)* |
-|--dropout |     The dropout rate             | float < 1.0 (0.1)* |
-|--mask-rate |     The masking rate             | float < 1.0; (None)* |
-|--n-epochs |     The number of epochs             | int (25)*|
-|--learning-rate |     The learning rate             | float (1e-3)* |
-|--weight-decay |     The weight decay rate             | float (1e-6)* |
-|--eval-only |     Only Evaluate the model    |   Append without argument(s)     |
-|-s |     Passing splits for training and testing    |     Append without argument(s)    |
-|--load-model |     Load Model             | bool (False)* |
-|--model-path |     The path to load model             | str ('logs/experiment/XVir.pt')* |
-|--model-save-interval |     How often to save the model             | int (5)*|
-|--model-update-interval |     How often to update the model             | int (2)* |
-|--model-save-path |     The path to save the trained model             | str ('./logs/experiment/XVir_models')*  |
-|--print-log-interval |     How often to print training logs            | int (1)* |
-|--val-log-interval |    How often to print validation logs             | int (5)* |
+|--device |     What to use for compute [GPU, CPU] will be called. | 'cuda' (Can specify 'cuda:[int]')|
+|--seed |    Random seed              | 4 |
+|--read_len |     Read length             | 150 |
+|--ngram |      Length of k-mer          | 6  |
+|--model-dim |    The embedding dimension of transformer | 128 |
+|--num-layers |     The number of layers  | 1 |
+|--batch-size |    The batch size | 100 |
+|--dropout |     Dropout rate (only for training)  | 0.1 |
+|--mask-rate |     Masking rate (only for training) | None |
+|--n-epochs |     Number of epochs             | 25 |
+|--learning-rate | Learning rate  | 0.001 |
+|--weight-decay |Weight decay rate  | 1e-6 |
+|--eval-only |     Only evaluate the model    |   N/A     |
+|-s |     Passing splits for training and testing    |     N/A    |
+|--load-model |     Load model | False |
+|--model-path |     Relative path to load model             | logs/experiment/XVir.pt' |
+|--model-save-interval |     How often (in epochs) to save the model             | 5|
+|--model-update-interval |     How often (in epochs) to update the model             | 2 |
+|--model-save-path |     Directory to save the trained model             | './logs/experiment/XVir_models'  |
+|--print-log-interval |     How often (in epochs) to print training logs  |1 |
+|--val-log-interval |    How often (in epochs) to print validation logs | 5 |
 
