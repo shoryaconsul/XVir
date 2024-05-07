@@ -98,3 +98,18 @@ The command line options for XVir are outlined below. The default values of thes
 |--print-log-interval |     How often (in epochs) to print training logs  |1 |
 |--val-log-interval |    How often (in epochs) to print validation logs | 5 |
 
+## Citation
+If you use this software, please cite:
+
+Consul, S., Robertson, J., & Vikalo, H. (2023). XVir: A Transformer-Based Architecture for Identifying Viral Reads from Cancer Samples. bioRxiv, 2023-08.
+
+The correspodning BibTex is:
+>@article{consul2023xvir,
+  title={XVir: A Transformer-Based Architecture for Identifying Viral Reads from Cancer Samples},
+  author={Consul, Shorya and Robertson, John and Vikalo, Haris},
+  journal={bioRxiv},
+  pages={2023--08},
+  year={2023},
+  publisher={Cold Spring Harbor Laboratory}
+}
+
