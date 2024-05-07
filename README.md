@@ -8,15 +8,17 @@ Feel free to update your `environment.yml` file. I've provided one example file.
 ### File Structure
 ```
 - utils/
-  - __init__.py         : Needed for python packaging for `utils`
-  - dataset.py          : Script to create dataset for XVir model
-  - collate_data.py     : Script for creating Pickle data objects from .txt files
-                          for numerically encoded reads
-  - general_tools.py    : General tools for arguments, and backup while training
-  - train_tools.py      : Tools for training
-  - sample_data.py      : Subsampling reads from given read FASTA file or Pickle object
+  - __init__.py             : Needed for python packaging for `utils`
+  - dataset.py              : Script to create dataset for XVir model
+  - collate_data.py         : Script for creating Pickle data objects from .txt files
+                              for numerically encoded reads
+  - general_tools.py        : General tools for arguments, and backup while training
+  - train_tools.py          : Tools for training
+  - sample_data.py          : Subsampling reads from given read FASTA file or Pickle object
   - train_test_val_split.py : Script to take input read FASTA files and write output splits
                               into individual FASTA files
+  - visualize_data.py       : Script to create t-SNE and MDS visualizations of reads
+  - fastq2fasta.sh          : Bash script to create FASTA files corresponding to input FASTQ files
   
 
 - data/                 : Place to store data
