@@ -9,13 +9,16 @@ Feel free to update your `environment.yml` file. I've provided one example file.
 ```
 - utils/
   - __init__.py         : Needed for python packaging for `utils`
-  - dataset.py          : Script to create dataset
-  - filtering.py        : Script for filtering. Needed for raw data processing
-  - collate_data.py     : Script for collating raw data into structured data
+  - dataset.py          : Script to create dataset for XVir model
+  - collate_data.py     : Script for creating Pickle data objects from .txt files
+                          for numerically encoded reads
   - general_tools.py    : General tools for arguments, and backup while training
-  - specific_tools.py   : Specific tools for given application
-  - plotting.py         : Some plotting scripts to plot results and data
   - train_tools.py      : Tools for training
+  - sample_data.py      : Subsampling reads from given read FASTA file or Pickle object
+  - train_test_val_split.py : Script to take input read FASTA files and write output splits
+                              into individual FASTA files
+  
+
 - data/                 : Place to store data
 - logs/                 : Place where logs will be saved
 - model.py              : GRU Model
